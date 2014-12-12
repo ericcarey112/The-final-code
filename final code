@@ -1,0 +1,167 @@
+#include <LiquidCrystal.h>
+#include <Wire.h>
+
+
+const int pingPin = 6;
+const int numRows = 2;
+const int numCols = 16;
+
+LiquidCrystal lcd(12,11,5,4,3,2);
+
+
+const int datapin = 8;
+const int clockpin = 9;
+const int latchpin = 10;
+
+byte data = 0;
+
+  
+void setup()
+{
+  pinMode(datapin, OUTPUT);
+  pinMode(clockpin, OUTPUT);
+  pinMode(latchpin, OUTPUT);
+  
+  lcd.begin(numCols,numRows);
+Serial.begin(9600);
+
+}
+
+void loop()
+{
+  long duration, inches;
+  
+  Serial.print(inches);
+  
+  pinMode(pingPin, OUTPUT);
+  digitalWrite(pingPin, LOW);
+  delayMicroseconds(2);
+  digitalWrite(pingPin, HIGH);
+  delayMicroseconds(5);
+  digitalWrite(pingPin, LOW);
+  pinMode(pingPin, INPUT);
+  duration = pulseIn(pingPin, HIGH);
+  inches = microsecondsToInches(duration);
+  lcd.clear();
+  
+  if(inches<=24)
+  {
+    disp();
+    allOn1();
+  }
+  
+  if(inches >24 && inches<=48) 
+  {
+    disp();
+    allOn2();
+}
+
+if(inches >48 && inches <=72)
+{
+  disp();
+  allOn3();
+}   
+
+else
+{
+ lcd.print("   ");
+}
+delay(250);
+}
+
+
+
+void disp()
+{
+  long duration, inches;
+  
+  Serial.print(inches);
+  
+  pinMode(pingPin, OUTPUT);
+  digitalWrite(pingPin, LOW);
+  delayMicroseconds(2);
+  digitalWrite(pingPin, HIGH);
+  delayMicroseconds(5);
+  digitalWrite(pingPin, LOW);
+  pinMode(pingPin, INPUT);
+  duration = pulseIn(pingPin, HIGH);
+  inches = microsecondsToInches(duration);
+  
+  lcd.print("Back Off");
+  lcd.setCursor(0,1);
+  lcd.print("Distance: ");
+  lcd.setCursor(9,1);
+  lcd.print(inches);
+  lcd.setCursor(12,1);
+  lcd.print("in");
+}
+
+long microsecondsToInches(long microseconds)
+{
+   return microseconds / 74 / 2;
+}
+void shiftWrite(int desiredPin, boolean desiredState){
+bitWrite(data, desiredPin, desiredState);
+shiftOut(datapin, clockpin, MSBFIRST, data);
+digitalWrite(latchpin, HIGH);
+digitalWrite(latchpin, LOW);
+}
+
+void allOn1()
+{
+  int index;
+ 
+for(index =0; index<=7; index ++)
+{
+ shiftWrite(index, HIGH);
+} 
+
+delay(100);
+
+for(index = 7; index>=0; index --)
+{
+shiftWrite(index, LOW);  
+}
+
+delay(100);
+}
+  
+
+void allOn2()
+{
+ int index;
+ 
+for(index =0; index<=7; index ++)
+{
+ shiftWrite(index, HIGH);
+} 
+
+delay(250);
+
+for(index = 7; index>=0; index --)
+{
+shiftWrite(index, LOW);  
+}
+delay(250);
+}
+
+void allOn3()
+{
+  int index;
+for(index =0; index<=7; index ++)
+{
+ shiftWrite(index, HIGH);
+} 
+
+delay(500);
+
+for(index = 7; index>=0; index --)
+{
+shiftWrite(index, LOW);  
+}
+
+delay(500);
+
+}
+  
+  
